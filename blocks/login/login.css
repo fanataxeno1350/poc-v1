@@ -1,0 +1,63 @@
+.login {
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 24px 0;
+}
+
+.login form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.login h2 {
+  margin: 0;
+}
+
+.login .login-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.login label {
+  font-size: var(--body-font-size-s);
+  font-weight: 500;
+}
+
+.login input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--dark-color);
+  border-radius: 4px;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  font-family: inherit;
+  font-size: var(--body-font-size-s);
+}
+
+.login input:focus-visible {
+  outline: 2px solid var(--link-color);
+  outline-offset: 2px;
+}
+
+.login input[aria-invalid="true"] {
+  border-color: #c9372c;
+}
+
+.login .login-error,
+.login .login-status {
+  margin: 0;
+  color: #c9372c;
+  font-size: var(--body-font-size-xs);
+}
+
+.login .login-error:empty,
+.login .login-status:empty {
+  display: none;
+}
+
+.login button[type="submit"] {
+  margin: 0;
+}
