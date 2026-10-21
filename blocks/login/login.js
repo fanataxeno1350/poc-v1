@@ -1,4 +1,5 @@
 import config from '../../scripts/config.js';
+import { getSession, safeRedirect, setToken } from '../../scripts/session.js';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -46,7 +47,11 @@ function validate(email, password) {
 
 export default function decorate(block) {
   const title = block.textContent.trim() || 'Sign in';
-  const { apiUrl, redirectUrl } = config.login;
+  const { apiUrl } = config.login;
+  const redirectUrl = safeRedirect(
+    new URLSearchParams(window.location.search).get('redirect'),
+    config.login.redirectUrl,
+  );
 
   const form = document.createElement('form');
   form.noValidate = true;
@@ -73,6 +78,9 @@ export default function decorate(block) {
   form.append(heading, email.wrapper, password.wrapper, status, submit);
   block.replaceChildren(form);
 
+  // already signed in: skip the form
+  if (getSession()) window.location.replace(redirectUrl);
+
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     status.textContent = '';
@@ -95,6 +103,11 @@ export default function decorate(block) {
         status.textContent = resp.status === 401 || resp.status === 403
           ? 'Incorrect email or password.'
           : 'Sign in failed. Please try again later.';
+        return;
+      }
+      const data = await resp.json().catch(() => ({}));
+      if (!setToken(data[config.login.tokenField])) {
+        status.textContent = 'Sign in failed. Please try again later.';
         return;
       }
       window.location.assign(redirectUrl);

@@ -9,7 +9,9 @@ import {
   loadSection,
   loadSections,
   loadCSS,
+  getMetadata,
 } from './aem.js';
+import { getSession, redirectToLogin } from './session.js';
 
 /**
  * Moves all the attributes from a given elmenet to another given element.
@@ -131,6 +133,11 @@ async function loadEager(doc) {
   decorateTemplateAndTheme();
   const main = doc.querySelector('main');
   if (main) {
+    // pages with metadata `auth: required` stay hidden until a session is confirmed
+    if (getMetadata('auth') === 'required' && !getSession()) {
+      redirectToLogin();
+      return;
+    }
     decorateMain(main);
     document.body.classList.add('appear');
     await loadSection(main.querySelector('.section'), waitForFirstImage);

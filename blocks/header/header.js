@@ -1,5 +1,6 @@
 import { getMetadata } from '../../scripts/aem.js';
 import { loadFragment } from '../fragment/fragment.js';
+import { getSession, logout } from '../../scripts/session.js';
 
 // media query match that indicates mobile/tablet width
 const isDesktop = window.matchMedia('(min-width: 900px)');
@@ -163,6 +164,19 @@ export default async function decorate(block) {
   // prevent mobile nav behavior on window resize
   toggleMenu(nav, navSections, isDesktop.matches);
   isDesktop.addEventListener('change', () => toggleMenu(nav, navSections, isDesktop.matches));
+
+  // sign out control for signed-in visitors
+  const user = getSession();
+  if (user) {
+    const navTools = nav.querySelector('.nav-tools') || nav.appendChild(document.createElement('div'));
+    navTools.classList.add('nav-tools');
+    const signOut = document.createElement('button');
+    signOut.type = 'button';
+    signOut.className = 'nav-signout';
+    signOut.textContent = 'Sign out';
+    signOut.addEventListener('click', logout);
+    navTools.append(signOut);
+  }
 
   const navWrapper = document.createElement('div');
   navWrapper.className = 'nav-wrapper';
