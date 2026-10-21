@@ -1,19 +1,6 @@
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+import config from '../../scripts/config.js';
 
-/**
- * Reads the authored configuration: one row per field (title, endpoint, redirect).
- * @param {Element} block The login block element
- */
-function readConfig(block) {
-  const [title, endpoint, redirect] = [...block.children]
-    .map((row) => row.textContent.trim());
-  const redirectLink = block.querySelector('a[href]');
-  return {
-    title: title || 'Sign in',
-    endpoint: endpoint || '',
-    redirect: redirectLink ? redirectLink.getAttribute('href') : redirect || '/',
-  };
-}
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function createField({
   id, label, type, autocomplete,
@@ -58,13 +45,14 @@ function validate(email, password) {
 }
 
 export default function decorate(block) {
-  const config = readConfig(block);
+  const title = block.textContent.trim() || 'Sign in';
+  const { apiUrl, redirectUrl } = config.login;
 
   const form = document.createElement('form');
   form.noValidate = true;
 
   const heading = document.createElement('h2');
-  heading.textContent = config.title;
+  heading.textContent = title;
 
   const email = createField({
     id: 'login-email', label: 'Email', type: 'email', autocomplete: 'username',
@@ -90,7 +78,7 @@ export default function decorate(block) {
     status.textContent = '';
     if (!validate(email, password)) return;
 
-    if (!config.endpoint) {
+    if (!apiUrl) {
       status.textContent = 'Login is not configured for this page.';
       return;
     }
@@ -98,7 +86,7 @@ export default function decorate(block) {
     submit.disabled = true;
     submit.textContent = 'Signing in…';
     try {
-      const resp = await fetch(config.endpoint, {
+      const resp = await fetch(apiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email.input.value.trim(), password: password.input.value }),
@@ -109,7 +97,7 @@ export default function decorate(block) {
           : 'Sign in failed. Please try again later.';
         return;
       }
-      window.location.assign(config.redirect);
+      window.location.assign(redirectUrl);
     } catch (err) {
       status.textContent = 'Unable to reach the login service. Please try again.';
     } finally {

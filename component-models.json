@@ -224,20 +224,6 @@
         "name": "title",
         "label": "Title",
         "value": "Sign in"
-      },
-      {
-        "component": "text",
-        "valueType": "string",
-        "name": "endpoint",
-        "label": "Login API URL",
-        "description": "Endpoint that receives a JSON POST with email and password",
-        "value": ""
-      },
-      {
-        "component": "aem-content",
-        "name": "redirect",
-        "label": "Redirect after login",
-        "description": "Page to open after a successful login"
       }
     ]
   }
