@@ -4,9 +4,9 @@
 const config = {
   login: {
     /* endpoint that receives a JSON POST with { email, password } */
-    apiUrl: '',
+    apiUrl: 'http://localhost:5000/api/auth/login',
     /* page to open after a successful login */
-    redirectUrl: '/',
+    redirectUrl: '/content/poc-v1/index.html',
   },
 };
 
