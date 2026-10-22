@@ -21,6 +21,28 @@
           "name": "keywords",
           "multi": true,
           "label": "Keywords"
+        },
+        {
+          "component": "select",
+          "name": "auth",
+          "label": "Access",
+          "description": "Require visitors to sign in to view this page",
+          "options": [
+            {
+              "name": "Public",
+              "value": ""
+            },
+            {
+              "name": "Sign in required",
+              "value": "required"
+            }
+          ]
+        },
+        {
+          "component": "aem-content",
+          "name": "login-page",
+          "label": "Login page",
+          "description": "Page visitors are sent to when they must sign in or sign out"
         }
       ]
     }
