@@ -1,4 +1,13 @@
 import config from './config.js';
+import { getMetadata } from './aem.js';
+
+/**
+ * Path of the login page, authored as `login-page` page metadata.
+ * @returns {string}
+ */
+export function getLoginPath() {
+  return getMetadata('login-page') || '/login';
+}
 
 /*
  * JWT session handling. The login API returns a JWT which is kept in a cookie written by this
@@ -91,7 +100,7 @@ export function safeRedirect(target, fallback) {
 export function redirectToLogin() {
   const { pathname, search, hash } = window.location;
   const back = encodeURIComponent(`${pathname}${search}${hash}`);
-  window.location.replace(`${config.login.loginPath}?redirect=${back}`);
+  window.location.replace(`${getLoginPath()}?redirect=${back}`);
 }
 
 /**
@@ -117,5 +126,5 @@ export async function authFetch(url, options = {}) {
  */
 export function logout() {
   clearToken();
-  window.location.assign(config.login.loginPath);
+  window.location.assign(getLoginPath());
 }

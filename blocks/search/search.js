@@ -53,13 +53,13 @@ function score(page, terms) {
   return total;
 }
 
-function search(pages, query) {
+function search(pages, query, maxResults) {
   const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
   return pages
     .map((page) => ({ page, points: score(page, terms) }))
     .filter(({ points }) => points > 0)
     .sort((a, b) => b.points - a.points)
-    .slice(0, config.search.maxResults)
+    .slice(0, maxResults)
     .map(({ page }) => page);
 }
 
@@ -90,7 +90,12 @@ function renderResults(list, pages) {
 }
 
 export default function decorate(block) {
-  const placeholder = block.textContent.trim() || 'Search pages';
+  // authored rows: placeholder, minimum characters, maximum results
+  const [placeholderRow, minRow, maxRow] = [...block.children]
+    .map((row) => row.textContent.trim());
+  const placeholder = placeholderRow || 'Search pages';
+  const minLength = Math.max(1, parseInt(minRow, 10) || 2);
+  const maxResults = Math.max(1, parseInt(maxRow, 10) || 10);
 
   const form = document.createElement('form');
   form.setAttribute('role', 'search');
@@ -126,13 +131,13 @@ export default function decorate(block) {
     else url.searchParams.delete('q');
     window.history.replaceState(null, '', url);
 
-    if (query.length < config.search.minLength) {
+    if (query.length < minLength) {
       results.replaceChildren();
       status.textContent = '';
       return;
     }
     try {
-      const matches = search(await loadIndex(), query);
+      const matches = search(await loadIndex(), query, maxResults);
       // ignore stale responses if the user kept typing
       if (query !== input.value.trim()) return;
       renderResults(results, matches);

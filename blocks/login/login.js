@@ -46,11 +46,15 @@ function validate(email, password) {
 }
 
 export default function decorate(block) {
-  const title = block.textContent.trim() || 'Sign in';
+  // authored rows: title, redirect page
+  const [titleRow, redirectRow] = [...block.children];
+  const title = titleRow?.textContent.trim() || 'Sign in';
+  const authoredRedirect = redirectRow?.querySelector('a')?.getAttribute('href')
+    || redirectRow?.textContent.trim();
   const { apiUrl } = config.login;
   const redirectUrl = safeRedirect(
     new URLSearchParams(window.location.search).get('redirect'),
-    config.login.redirectUrl,
+    safeRedirect(authoredRedirect, '/'),
   );
 
   const form = document.createElement('form');

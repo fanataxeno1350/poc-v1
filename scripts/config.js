@@ -1,5 +1,7 @@
 /**
- * Site-level configuration. Edit these values in code; they are not authorable.
+ * Site-level configuration for backend APIs and code behaviour. Edit these values in code;
+ * they are not authorable. Page paths and display options are authored instead: redirect and
+ * search options on their blocks, the login page path as `login-page` page metadata.
  */
 const config = {
   login: {
@@ -7,18 +9,10 @@ const config = {
     apiUrl: 'http://localhost:5000/api/auth/login',
     /* name of the property in the JSON response that holds the JWT */
     tokenField: 'token',
-    /* page to open after a successful login when no ?redirect= is given */
-    redirectUrl: '/content/poc-v1/home-page.html',
-    /* path of the page that contains the login block */
-    loginPath: '/content/poc-v1/login-page.html',
   },
   search: {
     /* JSON index of published pages, generated from helix-query.yaml */
     indexUrl: '/query-index.json',
-    /* minimum characters before results are shown */
-    minLength: 2,
-    /* maximum number of results to render */
-    maxResults: 10,
   },
   session: {
     /* name of the cookie in which the JWT is kept */

@@ -26,6 +26,12 @@
           "name": "title",
           "label": "Title",
           "value": "Sign in"
+        },
+        {
+          "component": "aem-content",
+          "name": "redirect",
+          "label": "Redirect after login",
+          "description": "Page to open after a successful login"
         }
       ]
     }

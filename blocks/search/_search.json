@@ -26,6 +26,22 @@
           "name": "placeholder",
           "label": "Placeholder",
           "value": "Search pages"
+        },
+        {
+          "component": "text",
+          "valueType": "number",
+          "name": "minLength",
+          "label": "Minimum characters",
+          "description": "Characters needed before results are shown",
+          "value": 2
+        },
+        {
+          "component": "text",
+          "valueType": "number",
+          "name": "maxResults",
+          "label": "Maximum results",
+          "description": "Most results shown at once",
+          "value": 10
         }
       ]
     }
