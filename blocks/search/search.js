@@ -53,10 +53,48 @@ function score(page, terms) {
   return total;
 }
 
-function search(pages, query, maxResults) {
+/**
+ * Searches AEM pages through QueryBuilder on the AEM publish instance.
+ * @returns {Promise<object[]>} pages shaped like query-index rows
+ */
+async function loadAemPages(query, limit, options) {
+  const { aemUrl, aemQueryPath } = config.search;
+  const { contentPath, publishedOnly, credentials } = options;
+  if (!aemUrl) return [];
+  const params = new URLSearchParams({
+    path: contentPath,
+    type: 'cq:Page',
+    fulltext: query,
+    'p.limit': String(limit),
+    'p.hits': 'selective',
+  });
+  if (publishedOnly) {
+    params.set('property', 'jcr:content/cq:lastReplicationAction');
+    params.set('property.value', 'Activate');
+  }
+  params.append('p.properties', 'jcr:path');
+  params.append('p.properties', 'jcr:content/jcr:title');
+  params.append('p.properties', 'jcr:content/jcr:description');
+  const resp = await fetch(`${aemUrl}${aemQueryPath}?${params}`, {
+    credentials: credentials ? 'include' : 'omit',
+  });
+  if (!resp.ok) throw new Error(`aem ${resp.status}`);
+  const { hits = [] } = await resp.json();
+  return hits.map((hit) => ({
+    path: `${aemUrl}${hit['jcr:path']}.html`,
+    title: hit['jcr:content/jcr:title'],
+    description: hit['jcr:content/jcr:description'],
+    source: 'AEM',
+  }));
+}
+
+function search(pages, query, maxResults, aemPages = []) {
   const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
-  return pages
-    .map((page) => ({ page, points: score(page, terms) }))
+  return [
+    ...pages.map((page) => ({ page, points: score(page, terms) })),
+    // AEM already matched on full text, so keep hits whose body (not title) matched
+    ...aemPages.map((page) => ({ page, points: Math.max(score(page, terms), 1) })),
+  ]
     .filter(({ points }) => points > 0)
     .sort((a, b) => b.points - a.points)
     .slice(0, maxResults)
@@ -84,18 +122,29 @@ function renderResults(list, pages) {
       desc.textContent = page.description;
       a.append(desc);
     }
+    if (page.source) {
+      const badge = document.createElement('span');
+      badge.className = 'search-result-source';
+      badge.textContent = page.source;
+      a.append(badge);
+    }
     li.append(a);
     return li;
   }));
 }
 
 export default function decorate(block) {
-  // authored rows: placeholder, minimum characters, maximum results
-  const [placeholderRow, minRow, maxRow] = [...block.children]
+  // authored rows: minimum characters, maximum results, AEM content path, AEM options
+  const [minRow, maxRow, pathRow, optionsRow = ''] = [...block.children]
     .map((row) => row.textContent.trim());
-  const placeholder = placeholderRow || 'Search pages';
+  const placeholder = 'Search pages';
   const minLength = Math.max(1, parseInt(minRow, 10) || 2);
   const maxResults = Math.max(1, parseInt(maxRow, 10) || 10);
+  const aemOptions = {
+    contentPath: pathRow || '/content',
+    publishedOnly: optionsRow.includes('publishedOnly'),
+    credentials: !optionsRow.includes('noCredentials'),
+  };
 
   const form = document.createElement('form');
   form.setAttribute('role', 'search');
@@ -137,7 +186,18 @@ export default function decorate(block) {
       return;
     }
     try {
-      const matches = search(await loadIndex(), query, maxResults);
+      const [site, aem] = await Promise.allSettled([
+        loadIndex(),
+        loadAemPages(query, maxResults, aemOptions),
+      ]);
+      // one source failing must not hide results from the other
+      if (site.status === 'rejected' && aem.status === 'rejected') throw site.reason;
+      const matches = search(
+        site.value || [],
+        query,
+        maxResults,
+        aem.value || [],
+      );
       // ignore stale responses if the user kept typing
       if (query !== input.value.trim()) return;
       renderResults(results, matches);

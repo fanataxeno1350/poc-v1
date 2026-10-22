@@ -22,13 +22,6 @@
       "fields": [
         {
           "component": "text",
-          "valueType": "string",
-          "name": "placeholder",
-          "label": "Placeholder",
-          "value": "Search pages"
-        },
-        {
-          "component": "text",
           "valueType": "number",
           "name": "minLength",
           "label": "Minimum characters",
@@ -42,6 +35,29 @@
           "label": "Maximum results",
           "description": "Most results shown at once",
           "value": 10
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "aemContentPath",
+          "label": "AEM content path",
+          "description": "Content root of the AEM project to search, e.g. /content/my-project",
+          "value": "/content"
+        },
+        {
+          "component": "multiselect",
+          "name": "aemOptions",
+          "label": "AEM options",
+          "options": [
+            {
+              "name": "Published AEM pages only",
+              "value": "publishedOnly"
+            },
+            {
+              "name": "Don't send AEM login (publish instance)",
+              "value": "noCredentials"
+            }
+          ]
         }
       ]
     }

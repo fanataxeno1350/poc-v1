@@ -74,3 +74,14 @@
 .search .search-results a:focus-visible .search-result-title {
   text-decoration: underline;
 }
+
+.search .search-result-source {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 0 6px;
+  border: 1px solid var(--dark-color);
+  border-radius: 3px;
+  color: var(--dark-color);
+  font-size: var(--body-font-size-xs);
+  line-height: 1.5;
+}
