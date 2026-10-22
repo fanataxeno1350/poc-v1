@@ -6,7 +6,7 @@ import { getMetadata } from './aem.js';
  * @returns {string}
  */
 export function getLoginPath() {
-  return getMetadata('login-page') || '/login';
+  return getMetadata('login-page') || '/login-page';
 }
 
 /*
