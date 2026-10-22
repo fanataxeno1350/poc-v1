@@ -58,7 +58,8 @@ function score(page, terms) {
  * @returns {Promise<object[]>} pages shaped like query-index rows
  */
 async function loadAemPages(query, limit, options) {
-  const { aemUrl, aemQueryPath } = config.search;
+  const { aemQueryPath } = config.search;
+  const aemUrl = config.search.aemUrl.replace(/\/+$/, '');
   const { contentPath, publishedOnly, credentials } = options;
   if (!aemUrl) return [];
   const params = new URLSearchParams({
