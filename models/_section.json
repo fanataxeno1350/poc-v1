@@ -51,7 +51,8 @@
         "cards",
         "columns",
         "fragment",
-        "login"
+        "login",
+        "search"
       ]
     }
   ]

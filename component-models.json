@@ -226,5 +226,17 @@
         "value": "Sign in"
       }
     ]
+  },
+  {
+    "id": "search",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "placeholder",
+        "label": "Placeholder",
+        "value": "Search pages"
+      }
+    ]
   }
 ]
